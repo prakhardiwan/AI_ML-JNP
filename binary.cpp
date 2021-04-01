@@ -2,6 +2,7 @@
 
 #define BLOCK_SIZE 8;
 
+
 // Cache
 uint32_t cache1[BLOCK_SIZE];
 uint32_t cache2[BLOCK_SIZE];
