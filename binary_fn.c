@@ -7,6 +7,20 @@
 uint32_t cache1[BLOCK_SIZE];
 uint32_t cache2[BLOCK_SIZE];
 
+void readMemPool(uint32_t cache[], MemPoolRequest* req){
+	uint32_t ptr = req.argument_2;
+	for(int i=0;i<BLOCK_SIZE;i=i+1){
+		cache[i] = *(ptr+i);		
+	}
+}
+
+void writeMemPool(uint32_t cache[], MemPoolRequest* req){
+	uint32_t ptr = req.argument_2;
+	for(int i=0;i<BLOCK_SIZE;i=i+1){
+		*(ptr+i) = cache[i] ;		
+	}
+}
+
 void binaryOperatorOnTensor (Tensor* a, Tensor* b, char op){
 	// In-place binary operator: performs a = a op b : element-wise
 	// supported op --> +,-,*,/ 
@@ -69,7 +83,7 @@ void binaryOperatorOnTensor (Tensor* a, Tensor* b, char op){
 	// $ we can check if op is supported or not before memory access for saving time 
 	
 
-	switch(op){ // read --> 2; write -->3
+	switch(op){ // for request_type: read --> 2; write -->3
 		case '+' : // a = a + b
 			for(int i=0; i<max_iter; i=i+1){
 				MemPoolRequest* req_a;
