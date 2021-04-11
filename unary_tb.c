@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
-#include "mempool.h"
-#include "tensor.h"
+#include "mempool_unary.h"
+#include "tensor_unary.h"
 #include "unary_fn.c"
-	
+
 const float pi = 3.14159265358979323846;
 
 float absol (float x) {
@@ -69,7 +69,7 @@ void main(){
 	Tensor A;
 	A = createTensor(ndim, dims, float32, 0);
 
-	uint32_t* mem = A.mem_pool_buffer_pointer;
+	float* mem = A.mem_pool_buffer_pointer;
 	//call function
 
 	unaryOperatorOnTensor(&A,'s');
@@ -87,7 +87,7 @@ void main(){
 			printf("pass %d\n",i);
 		}
 		else{
-			printf("Error at %d  value = %d\n",i,mem[i]);
+			printf("Error at %d  value = %f\n",i,mem[i]);
 			break;
 		}
 	}

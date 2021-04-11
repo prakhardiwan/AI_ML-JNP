@@ -4,14 +4,14 @@
 float cache[BLOCK_SIZE];
 
 void readMemPool(float cache[], MemPoolRequest* req) {
-	uint32_t* ptr = req->argument_2;
+	float* ptr = req->argument_2;
 	for(int i=0; i<BLOCK_SIZE; i+=1) {
 		cache[i] = *(ptr + i);
 	}
 }
 
 void writeMemPool(float cache[], MemPoolRequest* req) {
-	uint32_t* ptr = req->argument_2;
+	float* ptr = req->argument_2;
 	for(int i=0; i<BLOCK_SIZE; i+=1) {
 		*(ptr + i) = cache[i];
 	}
@@ -30,7 +30,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 
 	TensorDescriptor td_a = a->descriptor;
 
-	uint32_t num_dim = td_a.number_of_dimensions; // number of dimensions
+	uint32_t n_dim = td_a.number_of_dimensions; // number of dimensions
 
 	uint32_t flat_dims = 1; // product of dims (# of elements in tensor)
 	uint32_t max_iter = 1;  // # of iterations over which cache loaded, op performed, data sent back
@@ -73,7 +73,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 			}
 
 			break;
-		
+
 		case '2' : // a = (a)^2
 
 			for(int i=0; i<max_iter; i+=1) {
@@ -102,9 +102,9 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 
 			break;
 
-		case 's' : // a = sin(a)
+		case 's' : ;// a = sin(a)
             float x, term;
-			
+
 			for(int i=0; i<max_iter; i+=1) {
 
 				MemPoolRequest req_a;
@@ -118,7 +118,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 
                 if(dims + BLOCK_SIZE > flat_dims) { k = flat_dims - dims;}
                 else { k = BLOCK_SIZE;}
-				
+
 				for(int j=0; j<k; j+=1) {
 
 					cache[j] = setrange(cache[j]); // bring cache[j] val in (-pi, pi]
@@ -141,7 +141,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 			break;
 
 		case 'a' : // a = |a|
-			
+
 			for(int i=0; i<max_iter; i+=1) {
 
 				MemPoolRequest req_a;
@@ -155,7 +155,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 
                 if(dims + BLOCK_SIZE > flat_dims) { k = flat_dims - dims;}
                 else { k = BLOCK_SIZE;}
-				
+
 				for(int j=0; j<k; j+=1) {
 					if(cache[j]>=0) { continue;}
 					else {cache[j] *= -1.0;}
@@ -171,7 +171,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 
 		default  :
 			printf("%c operation not supported",op);
-			
+
 			return;
 	}
 
