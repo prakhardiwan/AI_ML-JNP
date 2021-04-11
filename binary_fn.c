@@ -1,10 +1,9 @@
 
 #define BLOCK_SIZE 8
 
-
 // Cache
-unsigned int cache1[BLOCK_SIZE];
-unsigned int cache2[BLOCK_SIZE];
+uint32_t cache1[BLOCK_SIZE];
+uint32_t cache2[BLOCK_SIZE];
 
 void readMemPool(uint32_t cache[], MemPoolRequest* req){
 	uint32_t* ptr = req->argument_2;
@@ -91,17 +90,18 @@ void binaryOperatorOnTensor (Tensor* a, Tensor* b, char op){
 				req_a.request_tag = i; //
 				req_a.argument_0 = BLOCK_SIZE; //assumed datatype/size
 				req_a.argument_1 = a->mem_pool_identifier;
-				req_a.argument_2 = a->mem_pool_buffer_pointer + BLOCK_SIZE*i*4; // data size to be incorporated
+				req_a.argument_2 = a->mem_pool_buffer_pointer + BLOCK_SIZE*i; // data size to be incorporated
 
 				MemPoolRequest req_b;
 				req_b.request_type = 2;
 				req_b.request_tag = i; //
 				req_b.argument_0 = BLOCK_SIZE; //assumed datatype/size
 				req_b.argument_1 = b->mem_pool_identifier;
-				req_b.argument_2 = b->mem_pool_buffer_pointer + BLOCK_SIZE*i*4; // data size to be incorporated
+				req_b.argument_2 = b->mem_pool_buffer_pointer + BLOCK_SIZE*i; // data size to be incorporated
 
 				readMemPool(cache1,&req_a);
 				readMemPool(cache2,&req_b);
+
 
                 uint32_t k;
                 if(dims+BLOCK_SIZE > flat_dims){
@@ -109,6 +109,7 @@ void binaryOperatorOnTensor (Tensor* a, Tensor* b, char op){
                 }else{
                     k = BLOCK_SIZE;
                 }
+
                 //printf("k = %d\n",k);
 				for(int j=0; j<k; j=j+1){ //typecasting problem
 					cache1[j] = cache1[j] + cache2[j];
