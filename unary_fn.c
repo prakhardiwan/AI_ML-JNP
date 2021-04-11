@@ -54,7 +54,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 				req_a.request_tag = i; //
 				req_a.argument_0 = BLOCK_SIZE; //assumed datatype/size
 				req_a.argument_1 = a->mem_pool_identifier;
-				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: byte-adr mem
+				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: word-adr mem
 
 				readMemPool(cache, &req_a);
 
@@ -83,7 +83,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 				req_a.request_tag = i; //
 				req_a.argument_0 = BLOCK_SIZE; //assumed datatype/size
 				req_a.argument_1 = a->mem_pool_identifier;
-				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: byte-adr mem
+				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: word-adr mem
 
 				readMemPool(cache, &req_a);
 
@@ -112,7 +112,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 				req_a.request_tag = i; //
 				req_a.argument_0 = BLOCK_SIZE; //assumed datatype/size
 				req_a.argument_1 = a->mem_pool_identifier;
-				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: byte-adr mem
+				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: word-adr mem
 
 				readMemPool(cache, &req_a);
 
@@ -149,7 +149,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 				req_a.request_tag = i; //
 				req_a.argument_0 = BLOCK_SIZE; //assumed datatype/size
 				req_a.argument_1 = a->mem_pool_identifier;
-				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: byte-adr mem
+				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: word-adr mem
 
 				readMemPool(cache, &req_a);
 
