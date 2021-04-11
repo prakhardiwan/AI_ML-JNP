@@ -6,22 +6,22 @@ float cache[BLOCK_SIZE];
 void readMemPool(float cache[], MemPoolRequest* req) {
 	uint32_t* ptr = req->argument_2;
 	for(int i=0; i<BLOCK_SIZE; i+=1) {
-		cache[i] = *(ptr + 4*i);
+		cache[i] = *(ptr + i);
 	}
 }
 
 void writeMemPool(float cache[], MemPoolRequest* req) {
 	uint32_t* ptr = req->argument_2;
 	for(int i=0; i<BLOCK_SIZE; i+=1) {
-		*(ptr + 4*i) = cache[i];
+		*(ptr + i) = cache[i];
 	}
 }
 
-float absolute(float x) {
-
-	if(x >= 0) { return x;}
-	
-	return (-1.0) * x;
+float setrange (float x) {
+	float pi = 3.14159265358979323846;
+    int temp = (x/(2.0*pi)) + 0.5;
+    x -= temp*2*pi;
+    return x;
 }
 
 void unaryOperatorOnTensor(Tensor* a, char op) {
@@ -54,7 +54,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 				req_a.request_tag = i; //
 				req_a.argument_0 = BLOCK_SIZE; //assumed datatype/size
 				req_a.argument_1 = a->mem_pool_identifier;
-				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i*4; // assumption: byte-adr mem
+				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: byte-adr mem
 
 				readMemPool(cache, &req_a);
 
@@ -83,7 +83,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 				req_a.request_tag = i; //
 				req_a.argument_0 = BLOCK_SIZE; //assumed datatype/size
 				req_a.argument_1 = a->mem_pool_identifier;
-				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i*4; // assumption: byte-adr mem
+				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: byte-adr mem
 
 				readMemPool(cache, &req_a);
 
@@ -103,9 +103,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 			break;
 
 		case 's' : // a = sin(a)
-			float eps = 1.0e-6;
             float x, term;
-            uint32_t MAX = 2 + (1e5); // max iterations 
 			
 			for(int i=0; i<max_iter; i+=1) {
 
@@ -114,7 +112,7 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 				req_a.request_tag = i; //
 				req_a.argument_0 = BLOCK_SIZE; //assumed datatype/size
 				req_a.argument_1 = a->mem_pool_identifier;
-				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i*4; // assumption: byte-adr mem
+				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: byte-adr mem
 
 				readMemPool(cache, &req_a);
 
@@ -123,16 +121,13 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 				
 				for(int j=0; j<k; j+=1) {
 
+					cache[j] = setrange(cache[j]); // bring cache[j] val in (-pi, pi]
 	                x = cache[j];
 					term = cache[j];
 
-					for(int iter=2; absolute(term) > eps; iter+=1) {
-						if(iter == MAX) {
-							cout << "MAX_ITERS exceeded for sine subroutine. Tensor element(s) too large.";
-							return;
-						}
+					for(int iter=2; iter < 1+8; iter+=1) { // Taylor Series approx. upto first 8 terms
 
-						term *= -1.0*x*x/(2*k-1)/(2*k-2);
+						term *= -1.0*x*x/(2*iter-1)/(2*iter-2);
 						cache[j] += term;
 					}
 				}
@@ -145,7 +140,33 @@ void unaryOperatorOnTensor(Tensor* a, char op) {
 
 			break;
 
-		case '/' :
+		case 'a' : // a = |a|
+			
+			for(int i=0; i<max_iter; i+=1) {
+
+				MemPoolRequest req_a;
+				req_a.request_type = 2;
+				req_a.request_tag = i; //
+				req_a.argument_0 = BLOCK_SIZE; //assumed datatype/size
+				req_a.argument_1 = a->mem_pool_identifier;
+				req_a.argument_2 = (a->mem_pool_buffer_pointer) + BLOCK_SIZE*i; // assumption: byte-adr mem
+
+				readMemPool(cache, &req_a);
+
+                if(dims + BLOCK_SIZE > flat_dims) { k = flat_dims - dims;}
+                else { k = BLOCK_SIZE;}
+				
+				for(int j=0; j<k; j+=1) {
+					if(cache[j]>=0) { continue;}
+					else {cache[j] *= -1.0;}
+				}
+
+				req_a.request_type = 3;
+				writeMemPool(cache, &req_a);
+
+				dims += k;
+			}
+
 			break;
 
 		default  :
