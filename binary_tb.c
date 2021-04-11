@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
 #include "../primitives/include/mempool.h"
@@ -35,7 +36,7 @@ Tensor createTensor (uint32_t ndim, uint32_t* dims, TensorDataType dt, uint16_t 
 
 	uint32_t* mem_pointer;
 
-	mem_pointer = malloc(mem_pool_size);
+	mem_pointer = (uint32_t*) malloc(mem_pool_size);
 
 	//initialize tensor with some values
 	for (int i = 0; i < mem_pool_size/4; ++i)
@@ -63,9 +64,10 @@ void main(){
 	//define tensor B
 	B = createTensor(ndim, dims, u32,1);
 
+	uint32_t* mem = B.mem_pool_buffer_pointer;
 	//call function
-	binaryOperatorOnTensor(&A,&B,'+');
 
+	binaryOperatorOnTensor(&A,&B,'+');
 
 	//check B
 	uint32_t mem_pool_size=1;
@@ -73,11 +75,11 @@ void main(){
 	{
 		mem_pool_size = mem_pool_size * dims[i]; //size_of(dt) map from enum
 	}
-	uint32_t* mem = A.mem_pool_buffer_pointer;
+    mem = A.mem_pool_buffer_pointer;
 	for (int i = 0; i < mem_pool_size; ++i)
 	{
 		if(mem[i] == 1+2*i){
-
+			printf("pass %d\n",i);
 		}else{
 			printf("Error at %d  value = %d\n",i,mem[i]);
 			break;
