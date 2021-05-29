@@ -2,7 +2,7 @@
 Repository for IITB AI-ML group work
 
 Group Members: 
-Andrews Varghese
+Andrews Varghese,
 Janeel Patel,
 Nayan Barhate, 
 Prakhar Diwan  
