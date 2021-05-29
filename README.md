@@ -1,4 +1,4 @@
-# AI_ML-JNP
+# AI/ML Hardware Group Work
 Repository for IITB AI-ML group work
 
 Group Members: 
